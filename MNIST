@@ -1,1 +1,8 @@
 
+acturally this is a folder that will contain 4 object you have downloaded :
+they are:
+         train-images-idx3-ubyte.gz
+         train-labels-idx1-ubyte.gz
+         t10k-images-idx3-ubyte.gz
+         t10k-labels-idx1-ubyte.gz
+you don't need to care about this,it just a remind.
