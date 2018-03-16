@@ -68,11 +68,11 @@ def do_eval(sess,
     eval_correct: The Tensor that returns the number of correct predictions.
     images_placeholder: The images placeholder.
     labels_placeholder: The labels placeholder.
-    data_set: The set of images and labels to evaluate, from
-      input_data.read_data_sets().
+    data_set: The set of images and labels to evaluate, from input_data.read_data_sets().
   """
+  
   # And run one epoch of eval.
-  true_count = 0  # Counts the number of correct predictions.
+  true_count = 0                # Counts the number of correct predictions.
   steps_per_epoch = data_set.num_examples // FLAGS.batch_size
   num_examples = steps_per_epoch * FLAGS.batch_size
   for step in xrange(steps_per_epoch):
@@ -87,34 +87,32 @@ def do_eval(sess,
 
 def run_training():
   """Train MNIST for a number of steps."""
-  # Get the sets of images and labels for training, validation, and
-  # test on MNIST.
+  #获取数据.
   data_sets = input_data.read_data_sets(FLAGS.train_dir, FLAGS.fake_data)
 
-  # Tell TensorFlow that the model will be built into the default Graph.
+  # 建图Graph.
   with tf.Graph().as_default():
-    # Generate placeholders for the images and labels.
-    images_placeholder, labels_placeholder = placeholder_inputs(
-        FLAGS.batch_size)
+    #  为images和labels生成 placeholders.
+    images_placeholder, labels_placeholder = placeholder_inputs(FLAGS.batch_size)
 
-    # Build a Graph that computes predictions from the inference model.
+    # 建立Graph从inference模型中计算预测.
     logits = mnist.inference(images_placeholder,
                              FLAGS.hidden1,
                              FLAGS.hidden2)
 
-    # Add to the Graph the Ops for loss calculation.
+    # 向图中添加loss calculation的op.
     loss = mnist.loss(logits, labels_placeholder)
 
-    # Add to the Graph the Ops that calculate and apply gradients.
+    # 向图中添加calculate和apply gradients的操作op.
     train_op = mnist.training(loss, FLAGS.learning_rate)
 
-    # Add the Op to compare the logits to the labels during evaluation.
+    # 向图中添加评估的准确率.
     eval_correct = mnist.evaluation(logits, labels_placeholder)
 
-    # Build the summary operation based on the TF collection of Summaries.
+    # 汇总到summary.
     summary_op = tf.summary.merge_all()
 
-    # Create a saver for writing training checkpoints.
+    # 创建saver来写入.
     saver = tf.train.Saver()
 
     # Create a session for running Ops on the Graph.
@@ -125,10 +123,10 @@ def run_training():
     sess.run(init)
 
     # Instantiate a SummaryWriter to output summaries and the Graph.
-    summary_writer = tf.summary.FileWriter(FLAGS.train_dir,
-                                            graph_def=sess.graph_def)
+    summary_writer = tf.summary.FileWriter(FLAGS.train_dir,graph_def=sess.graph_def)
 
-    # And then after everything is built, start the training loop.
+
+    # start the training loop.
     for step in xrange(FLAGS.max_steps):
       start_time = time.time()
 
@@ -148,24 +146,30 @@ def run_training():
 
       duration = time.time() - start_time
 
+
       # Write the summaries and print an overview fairly often.
       if step % 100 == 0:
+      
         # Print status to stdout.
         print('Step %d: loss = %.2f (%.3f sec)' % (step, loss_value, duration))
+        
         # Update the events file.
         summary_str = sess.run(summary_op, feed_dict=feed_dict)
         summary_writer.add_summary(summary_str, step)
 
+
       # Save a checkpoint and evaluate the model periodically.
       if (step + 1) % 1000 == 0 or (step + 1) == FLAGS.max_steps:
         saver.save(sess, FLAGS.train_dir, global_step=step)
-        # Evaluate against the training set.
+        
+        # Evaluate against the training set   
         print('Training Data Eval:')
         do_eval(sess,
                 eval_correct,
                 images_placeholder,
                 labels_placeholder,
                 data_sets.train)
+                
         # Evaluate against the validation set.
         print('Validation Data Eval:')
         do_eval(sess,
@@ -173,6 +177,7 @@ def run_training():
                 images_placeholder,
                 labels_placeholder,
                 data_sets.validation)
+                
         # Evaluate against the test set.
         print('Test Data Eval:')
         do_eval(sess,
